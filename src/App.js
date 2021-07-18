@@ -1,8 +1,10 @@
 import Header from './components/Header'
 import Tasks from './components/Tasks';
+import AddTask from './components/AddTask';
 import { useState } from "react"
 
 function App() {
+  const[showAddTask, setShowAddTask] = useState(false)
   const [tasks, setTasks] = useState([
     {
         id: 1, 
@@ -20,21 +22,51 @@ function App() {
         id: 3,
         text: 'Food Shopping',
         day: 'Feb 5th at 2:30pm',
-        reminder: true,
+        reminder: false,
     }
   ])
 
+  //Add Task
+  const addTask = (task) =>{
+    const id = Math.floor(Math.random()*10000) + 1
+    const newTask = {id, ...task}
+    setTasks([...tasks, newTask])
+  }
+
+
   // Delete Task
   const deleteTask = function(id){
-    console.log('delete', id);
+    //setTasks(tasks.filter((task)=>task.id !== id))
+    setTasks(tasks.filter(function(task){return(task.id !== id)}))
   }
+
+  // Toggle reminder
+  const toggleReminder = (id) => {
+    setTasks(tasks.map((task) => 
+      task.id === id ? {...task, reminder: !task.reminder}: task)
+    )
+  }
+
 
   return (
     <div className="container">
-      <Header />
-      <Tasks tasks={tasks} onDelete={deleteTask} />
+      <Header onAdd={() => setShowAddTask(!showAddTask)} showAdd={showAddTask}/>
+      {showAddTask && <AddTask onAdd={addTask}/>}
+      {tasks.length > 0 ? (
+        <Tasks 
+          tasks={tasks} 
+          onDelete={deleteTask} 
+          onToggle={toggleReminder}
+        />
+      ) : (
+        'No Tasks To Show'
+      )}
     </div>
   );
 }
+
+/* {showAddTask && <AddTask onAdd={addTask}/>} */
+/* above says if showAddTask which us default to false but if it becomes true then it will show the addTask screen
+   We used && because we didnt need an else statement */
 
 export default App;
